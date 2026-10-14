@@ -10,8 +10,6 @@
 
 #include <stdint.h>
 #include "stm32f4xx.h"
-#include "spi_driver.h"
-#include "systick.h"
 #include "gpio_driver.h"
 
 typedef void (*spi_transmit_func)(void *spi_handle, const uint8_t *src, uint32_t size);
