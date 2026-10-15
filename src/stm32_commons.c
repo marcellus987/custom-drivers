@@ -158,7 +158,7 @@ void wrapper_i2c_receive_repeat_start(void *i2c_handle, uint16_t devAddress, uin
 
 
 /***** Power related commons START. *****/
-void enterStandby(void) {
+void enterStandbyWkPin(void) {
 	/* Enable clock for PWR. */
 	__HAL_RCC_PWR_CLK_ENABLE();
 
@@ -168,6 +168,22 @@ void enterStandby(void) {
 	/* Clear flags and pending interrupts to ensure it will enter Standby mode. */
 	clearWakeUpFlags();
 	EXTI->PR |= (0x67FFFFU);
+	HAL_PWR_EnterSTANDBYMode();
+}
+
+void enterStandbyRtcWkTimer(RTC_HandleTypeDef *hrtc, uint32_t duration) {
+	/* Enable clock for PWR. */
+	__HAL_RCC_PWR_CLK_ENABLE();
+
+	/* Ensure RTC wake up timer is disabled before setting up standby mode with RTC timer. */
+	HAL_RTCEx_DeactivateWakeUpTimer(hrtc);
+
+	HAL_SuspendTick();
+
+	/* Clear flags and pending interrupts to ensure it will enter Standby mode. */
+	clearWakeUpFlags();
+	EXTI->PR |= (0x67FFFFU);
+	HAL_RTCEx_SetWakeUpTimer_IT(hrtc, duration, RTC_WAKEUPCLOCK_CK_SPRE_16BITS);
 	HAL_PWR_EnterSTANDBYMode();
 }
 
@@ -206,23 +222,23 @@ void enterStopMode(void) {
 /***** Power related commons END. *****/
 
 /***** Timer related commons. *****/
-//uint32_t wrapper_timer_get_time(void *timer_handle) {
-//	TIM_HandleTypeDef * htimer = timer_handle;
-//
-//	return (htimer->Instance->CNT);
-//}
-//
-///* Polling version. */
-//void wrapper_timer_delay(void *timer_handle, uint32_t delay) {
-//	TIM_HandleTypeDef * htimer = timer_handle;
-//	TIM_TypeDef *timer = htimer->Instance;
-//
-//	uint32_t startTime = timer->CNT;
-//
-//	while((timer->CNT - startTime) < delay) {
-//
-//	}
-//}
+uint32_t wrapper_timer_get_time(void *timer_handle) {
+	TIM_HandleTypeDef * htimer = timer_handle;
+
+	return (htimer->Instance->CNT);
+}
+
+/* Polling version. */
+void wrapper_timer_delay(void *timer_handle, uint32_t delay) {
+	TIM_HandleTypeDef * htimer = timer_handle;
+	TIM_TypeDef *timer = htimer->Instance;
+
+	uint32_t startTime = timer->CNT;
+
+	while((timer->CNT - startTime) < delay) {
+
+	}
+}
 
 /***** RTC related commons START. *****/
 void RTC_convertToBCD(uint8_t* fields, uint8_t fieldCount) {

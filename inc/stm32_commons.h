@@ -40,7 +40,8 @@ void wrapper_i2c_receive_repeat_start(void *i2c_handle, uint16_t devAddress, uin
 
 
 /***** Power related commons. *****/
-void enterStandby(void);
+void enterStandbyWkPin(void);
+void enterStandbyRtcWkTimer(RTC_HandleTypeDef *hrtc, uint32_t duration);
 uint8_t wakeFromStandby(void);
 void clearWakeUpFlags(void);
 void enterStopMode(void);
