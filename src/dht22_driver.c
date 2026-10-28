@@ -101,21 +101,23 @@ void processTempHumidSensorData(const raw_dht22_data_t *rawSensorData, dht22_dat
 	uint16_t tempRawBits = rawSensorData->raw_tempInt << 8 | rawSensorData->raw_tempDec;
 
 	/***** Humidity data. *****/
-	int wholeHumReading = (int)humRawBits;
+	uint16_t wholeHumReading = humRawBits;
 	sensorData->humidityInt = wholeHumReading / 10;
 	sensorData->humidityDec = wholeHumReading % 10;
 
 	/***** Temperature data. *****/
-	int wholeTempReading = ((int)(tempRawBits & 0x7FFF));
+	uint16_t wholeTempReading = tempRawBits & 0x7FFFU;
 
-	/* Negate if MSB is set. */
-	if(tempRawBits & 0x8000U) {
-		wholeTempReading *= -1;
-	}
+	
 
 	/* Extract Bits excluding MSB which is sign-bit. */
 	sensorData->tempInt = wholeTempReading / 10;
 	sensorData->tempDec = wholeTempReading % 10;
+	
+	/* Negate if MSB is set. */
+	if(tempRawBits & 0x8000U) {
+		sensorData->tempInt *= -1;
+	}
 }
 
 

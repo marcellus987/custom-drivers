@@ -29,10 +29,10 @@ typedef struct {
 
 /* Structure of data from sensor. */
 typedef struct {
-	int humidityInt;
-	int humidityDec;
-	int tempInt;
-	int tempDec;
+	uint8_t humidityInt;
+	uint8_t humidityDec;
+	int8_t tempInt;
+	uint8_t tempDec;
 } dht22_data_t;
 
 /* Timer has to have micro-second precision. */
