@@ -511,6 +511,17 @@ void rylr689_radio_send(const rylr689_instance_t *dev, const uint32_t packetSize
 
 
 void rylr689_radio_init(rylr689_instance_t *dev) {
+	/* Perform hardware reset. */
+	dev->pinWrite(dev->nresetPin.port, dev->nresetPin.pin, 0); /* NRESET is active-low. */
+
+	/* Probably enough for 100 microsecond delay. Replace this with a timer in the future.
+	 * This version depends on your system speed. At 16Mhz each tick is ~62.5 ns. Assuming each
+	 * instruction for this for loop takes 1 cycle (tick), then 10,000 iteration should be more than enough.
+	 * Check with logic analyzer to be sure or oscilloscope. */
+	for(volatile int i = 0; i < 10000; ++i) {
+		;
+	}
+	dev->pinWrite(dev->nresetPin.port, dev->nresetPin.pin, 1); /* Pull high to end reset state. */
 
 	configCommonParams(dev);
 
